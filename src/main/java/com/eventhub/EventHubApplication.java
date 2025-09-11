@@ -1,13 +1,13 @@
-package com.example.reviews;
+package com.eventhub;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ReviewsApplication {
+public class EventHubApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ReviewsApplication.class, args);
+		SpringApplication.run(EventHubApplication.class, args);
 	}
 
 }
