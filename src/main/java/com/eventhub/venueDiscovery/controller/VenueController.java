@@ -1,38 +1,40 @@
 package com.eventhub.venueDiscovery.controller;
 
-
-import com.eventhub.reviews.dto.ReviewPageResponse;
-import com.eventhub.venueDiscovery.dto.VenueSearchResponse;
+import com.eventhub.venueDiscovery.dto.VenueFilterRequest;
+import com.eventhub.venueDiscovery.dto.VenueRequest;
+import com.eventhub.venueDiscovery.entity.Venue;
+import com.eventhub.venueDiscovery.service.VenueService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/venues")
+@RequestMapping("/api/v1/venues")
 public class VenueController {
-    @GetMapping("")
-    public ResponseEntity<List<VenueSearchResponse>> searchVenues(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) Integer capacity,
-            @RequestParam(required = false) List<String> tags,
-            @RequestParam(required = false) String sortBy
-    ) {
-        // TODO: Implement venue search logic
-        return ResponseEntity.ok(List.of());
+    @Autowired
+    private VenueService venueService;
+
+    @PostMapping
+    public ResponseEntity<?> createVenue(@RequestBody VenueRequest request) {
+
+        try {
+            Venue venue = venueService.createVenue(request);
+            return ResponseEntity.ok(venue);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
-    @GetMapping("/{id}/reviews")
-    public ResponseEntity<ReviewPageResponse> getVenueReviews(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize
-    ) {
-        // TODO: Implement paginated review fetch
-        return ResponseEntity.ok(new ReviewPageResponse());
+    @GetMapping
+    public ResponseEntity<List<?>> getAllVenues(
+            @RequestParam(required = false) List<String> city,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) Integer minCapacity,
+            @RequestParam(required = false) Integer maxCapacity) {
+        List<Venue> venues = venueService.getAllVenues(city, tags, minCapacity, maxCapacity);
+        return ResponseEntity.ok(venues);
     }
 }
