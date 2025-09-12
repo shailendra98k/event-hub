@@ -1,6 +1,6 @@
 package com.eventhub.auth.dto;
 
-public class AuthRequest {
+public class LoginRequest {
     public String email;
     public String password;
 }
