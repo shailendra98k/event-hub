@@ -14,14 +14,18 @@ jobs:
       - name: Overwrite Application property file
         run: |
           cd src/main/resources
-          echo spring.datasource.url='jdbc:postgresql://${{secrets.DB}}:5432/crispyRead' > application.properties 
-          echo spring.datasource.username='${{secrets.DB_USER}}' >> application.properties
-          echo spring.datasource.password='${{secrets.DB_PASSWORD}}' >> application.properties
+          echo server.port=8080 >> application.properties
+          echo spring.datasource.url=jdbc:postgresql://${DB}:5433/postgres >> application.properties
+          echo spring.datasource.username=${DB_USER} >> application.properties
+          echo spring.datasource.password=${DB_USER_PASSWORD} >> application.properties
           echo spring.datasource.driver-class-name=org.postgresql.Driver >> application.properties
           echo spring.jpa.hibernate.ddl-auto=update >> application.properties
-          echo spring.security.user.name='${{secrets.USER}}' >> application.properties
-          echo spring.security.user.password='${{secrets.USER_PASSWORD}}' >> application.properties
-          echo auth.token.cookie='${{secrets.AUTH_TOKEN_COOKIE}}' >> application.properties
+          echo spring.redis.host=redis-16119.c305.ap-south-1-1.ec2.redns.redis-cloud.com >> application.properties
+          echo spring.redis.port=16119 >> application.properties
+          echo spring.redis.password=OqlZw2EjqmIQVmuqXKoTKbGwW4SgiuOr >> application.properties
+          
+          echo jwt.secret=MySuperSecretKeyForJWTGeneration1234567890 >> application.properties
+          echo jwt.expiration=15 >> application.properties
 
       - name: Build Docker Image
         run: |
@@ -37,7 +41,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: shailendra98k/crispyread-core
+          images: shailendra98k/eventhub
 
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -59,13 +63,13 @@ jobs:
       - name: Update ECS Task Definition
         run: |
           # Using AWS CLI to update the ECS task definition with the new image tag
-          aws ecs register-task-definition --family crispyread-core  --container-definitions '[{"name":"crispyread-core","image":"shailendra98k/crispyread-core:master", "memory":428, "portMappings":[{"hostPort": 8080, "protocol": "tcp", "containerPort":8080}] }]' --region ap-south-1
+          aws ecs register-task-definition --family eventhub  --container-definitions '[{"name":"eventhub","image":"shailendra98k/eventhub:master", "memory":428, "portMappings":[{"hostPort": 8080, "protocol": "tcp", "containerPort":8080}] }]' --region ap-south-1
 
       - name: Stop ECS Task
         run: |
-          aws ecs list-tasks --cluster "CrispyRead" --family crispyread-core | jq -r ".taskArns[]" | xargs -r -n1 aws ecs stop-task --no-cli-pager --cluster "CrispyRead" --task
+          aws ecs list-tasks --cluster "EventHub" --family eventhub | jq -r ".taskArns[]" | xargs -r -n1 aws ecs stop-task --no-cli-pager --cluster "EventHub" --task
 
       - name: Run ECS Task
         run: |
           # Using AWS CLI to run the ECS task using the updated task definition
-          aws ecs run-task --cluster CrispyRead --task-definition crispyread-core
+          aws ecs run-task --cluster EventHub --task-definition eventhub
