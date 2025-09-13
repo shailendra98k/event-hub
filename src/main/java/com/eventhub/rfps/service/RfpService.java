@@ -5,11 +5,14 @@ import com.eventhub.rfps.dto.RfpRequest;
 import com.eventhub.rfps.entity.RFP_STATUS;
 import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.repository.RfpRepository;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -18,7 +21,7 @@ public class RfpService {
     @Autowired
     private RfpRepository rfpRepository;
 
-    public Rfp createRfp(RfpRequest request) {
+    public Rfp createRfp(RfpRequest request) throws AuthenticationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Long userId = userDetails.getUserId();
@@ -36,16 +39,16 @@ public class RfpService {
                     .build();
             return rfpRepository.save(rfp);
         } else {
-            throw new IllegalStateException("User not authenticated");
+            throw new AuthenticationException("User not authenticated");
         }
 
 
     }
 
-    public Rfp updateRfp(Long rfpId, RfpRequest request) {
+    public Rfp updateRfp(Long rfpId, RfpRequest request) throws AuthenticationException, ChangeSetPersister.NotFoundException {
         Optional<Rfp> optionalRfp = rfpRepository.findById(rfpId);
         if (optionalRfp.isEmpty()) {
-            return null;
+            throw new ChangeSetPersister.NotFoundException();
         }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
@@ -67,11 +70,28 @@ public class RfpService {
                     .build();
             return rfpRepository.save(updateRfRfp);
         } else {
-            throw new IllegalStateException("User not authenticated");
+            throw new AuthenticationException("User not authenticated");
         }
     }
 
-    public Optional<Rfp> getRfpById(Long rfpId) {
+    public Optional<Rfp> getRfpById(Long rfpId) throws ChangeSetPersister.NotFoundException {
+
+
+        Optional<Rfp> optionalRfp = rfpRepository.findById(rfpId);
+        if (optionalRfp.isEmpty()) {
+            throw new ChangeSetPersister.NotFoundException();
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+            Long userId = userDetails.getUserId();
+            Rfp rfp = optionalRfp.get();
+            if (!rfp.getBuyerUserId().equals(userId)) {
+                return Optional.empty();
+            }
+        } else {
+            throw new ChangeSetPersister.NotFoundException();
+        }
+
         return rfpRepository.findById(rfpId);
     }
 }

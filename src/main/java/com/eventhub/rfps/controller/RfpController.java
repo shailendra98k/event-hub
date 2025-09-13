@@ -5,7 +5,9 @@ import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.service.RfpService;
 import com.eventhub.shared.dto.ErrorDetails;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +38,8 @@ public class RfpController {
                 return ResponseEntity.notFound().build();
             }
             return ResponseEntity.ok(updateRfp);
+        } catch (ChangeSetPersister.NotFoundException e) {
+            return ResponseEntity.status(404).body(new ErrorDetails(404, "Not Found"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
@@ -43,8 +47,15 @@ public class RfpController {
     }
 
     @GetMapping("/{rfpId}")
-    public ResponseEntity<Rfp> getRfpById(@PathVariable Long rfpId) {
-        Optional<Rfp> optionalRfp = rfpService.getRfpById(rfpId);
-        return optionalRfp.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> getRfpById(@PathVariable Long rfpId) {
+        try {
+            Optional<Rfp> optionalRfp = rfpService.getRfpById(rfpId);
+            return optionalRfp.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (ChangeSetPersister.NotFoundException e) {
+            return ResponseEntity.status(404).body(new ErrorDetails(404, "Not Found"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
+        }
     }
 }
