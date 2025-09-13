@@ -5,6 +5,8 @@ import com.eventhub.auth.entity.User;
 import com.eventhub.auth.repository.UserRepository;
 import com.eventhub.auth.dto.SignupRequest;
 import com.eventhub.auth.dto.LoginRequest;
+import com.eventhub.auth.util.JwtUtil;
+import com.eventhub.auth.dto.LoginResponse;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,10 +19,12 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     public User signup(SignupRequest request) throws BadRequestException {
@@ -35,15 +39,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         Optional<User> userOpt = userRepository.findByEmail(request.email);
         if (userOpt.isEmpty()) {
             return null;
         }
+
         User user = userOpt.get();
         if (!passwordEncoder.matches(request.password, user.getHashedPassword())) {
             return null;
         }
-        return user;
+        return LoginResponse.builder()
+                .token(jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name()))
+                .build();
+
     }
 }
