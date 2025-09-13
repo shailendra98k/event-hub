@@ -1,6 +1,7 @@
 package com.eventhub.venueDiscovery.controller;
 
 import com.eventhub.venueDiscovery.dto.VenueFilterRequest;
+import com.eventhub.venueDiscovery.dto.VenueInfo;
 import com.eventhub.venueDiscovery.dto.VenueRequest;
 import com.eventhub.venueDiscovery.entity.Venue;
 import com.eventhub.venueDiscovery.service.VenueService;
@@ -34,7 +35,7 @@ public class VenueController {
             @RequestParam(required = false) List<String> tags,
             @RequestParam(required = false) Integer minCapacity,
             @RequestParam(required = false) Integer maxCapacity) {
-        List<Venue> venues = venueService.getAllVenues(city, tags, minCapacity, maxCapacity);
+        List<VenueInfo> venues = venueService.getAllVenues(city, tags, minCapacity, maxCapacity);
         return ResponseEntity.ok(venues);
     }
 }

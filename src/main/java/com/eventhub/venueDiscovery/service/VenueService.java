@@ -2,7 +2,7 @@ package com.eventhub.venueDiscovery.service;
 
 import com.eventhub.auth.entity.User;
 import com.eventhub.auth.repository.UserRepository;
-import com.eventhub.venueDiscovery.dto.VenueFilterRequest;
+import com.eventhub.venueDiscovery.dto.VenueInfo;
 import com.eventhub.venueDiscovery.dto.VenueRequest;
 import com.eventhub.venueDiscovery.entity.Venue;
 import com.eventhub.venueDiscovery.repository.VenueRepository;
@@ -18,6 +18,9 @@ import java.util.Optional;
 public class VenueService {
     @Autowired
     private VenueRepository venueRepository;
+
+    @Autowired
+    private RedisService redisService;
 
     @Autowired
     private UserRepository userRepository;
@@ -47,9 +50,14 @@ public class VenueService {
         return venueRepository.save(venue);
     }
 
-    public List<Venue> getAllVenues(List<String> cities, List<String> tags, Integer minCapacity, Integer maxCapacity) {
+    public List<VenueInfo> getAllVenues(List<String> cities, List<String> tags, Integer minCapacity, Integer maxCapacity) {
         Specification<Venue> spec = null;
 
+        String key = redisService.generateAllVenuesKey(cities, tags, minCapacity, maxCapacity);
+        List<VenueInfo> cachedVenues = redisService.getCachedVenues(key);
+        if (cachedVenues != null) {
+            return cachedVenues;
+        }
         if (cities != null && !cities.isEmpty()) {
             Specification<Venue> citiesSpec = (root, query, cb) -> root.get("city").in(cities);
             spec = (spec == null) ? citiesSpec : spec.and(citiesSpec);
@@ -66,7 +74,13 @@ public class VenueService {
             Specification<Venue> maxCapSpec = (root, query, cb) -> cb.lessThanOrEqualTo(root.get("capacityMax"), maxCapacity);
             spec = (spec == null) ? maxCapSpec : spec.and(maxCapSpec);
         }
-        return (spec == null) ? venueRepository.findAll() : venueRepository.findAll(spec);
+        List<Venue> venues = (spec == null) ? venueRepository.findAll() : venueRepository.findAll(spec);
+        List<VenueInfo> result = new java.util.ArrayList<>();
+        for (Venue venue : venues) {
+            result.add(VenueInfo.fromVenue(venue));
+        }
+        redisService.cacheVenues(key, result);
+        return result;
 
     }
 
