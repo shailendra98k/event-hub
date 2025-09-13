@@ -1,10 +1,14 @@
 package com.eventhub.rfps.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.Instant;
 
 @Entity
 @Table(name = "rfps")
+@Getter
+@Builder
 public class Rfp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +43,5 @@ public class Rfp {
 
     @Column(nullable = false)
     private Instant updatedAt;
-
-    // Getters and setters
 }
 
