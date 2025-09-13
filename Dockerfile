@@ -21,7 +21,7 @@ WORKDIR /app
 
 #COPY --from=node-builder /app .
 
-RUN ./mvnw clean compile install -Dmaven.test.skip=true
+RUN ./mvnw clean install -Dmaven.test.skip=true
 
 FROM --platform=linux/amd64 openjdk:17-alpine AS runner
 
