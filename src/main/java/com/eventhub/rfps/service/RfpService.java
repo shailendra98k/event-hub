@@ -5,7 +5,6 @@ import com.eventhub.rfps.dto.RfpRequest;
 import com.eventhub.rfps.entity.RFP_STATUS;
 import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.repository.RfpRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.Authentication;
