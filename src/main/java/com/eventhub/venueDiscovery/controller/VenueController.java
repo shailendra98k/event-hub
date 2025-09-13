@@ -38,4 +38,14 @@ public class VenueController {
         List<VenueInfo> venues = venueService.getAllVenues(city, tags, minCapacity, maxCapacity);
         return ResponseEntity.ok(venues);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getVenueById(@PathVariable Long id) {
+        VenueInfo venueInfo = venueService.getVenueById(id);
+        if (venueInfo != null) {
+            return ResponseEntity.ok(venueInfo);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

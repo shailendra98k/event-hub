@@ -84,4 +84,14 @@ public class VenueService {
 
     }
 
+    public VenueInfo getVenueById(Long id) {
+        Optional<Venue> venue = venueRepository.findById(id);
+
+        if(venue.isPresent()) {
+            return VenueInfo.fromVenue(venue.get());
+        } else {
+            return null;
+        }
+    }
+
 }
