@@ -3,6 +3,7 @@ package com.eventhub.rfps.controller;
 import com.eventhub.rfps.dto.RfpRequest;
 import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.service.RfpService;
+import com.eventhub.shared.dto.ErrorDetails;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +18,28 @@ public class RfpController {
     private RfpService rfpService;
 
     @PostMapping
-    public ResponseEntity<Rfp> createRfp(@RequestBody @Valid RfpRequest request) {
-        Rfp saved = rfpService.createRfp(request);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<?> createRfp(@RequestBody @Valid RfpRequest request) {
+        try {
+            Rfp rfp = rfpService.createRfp(request);
+            return ResponseEntity.ok(rfp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
+        }
     }
 
     @PutMapping("/{rfpId}")
-    public ResponseEntity<Rfp> updateRfp(@PathVariable Long rfpId, @RequestBody RfpRequest request) {
-        Rfp saved = rfpService.updateRfp(rfpId, request);
-        if (saved == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateRfp(@PathVariable Long rfpId, @RequestBody RfpRequest request) {
+        try {
+            Rfp updateRfp = rfpService.updateRfp(rfpId, request);
+            if (updateRfp == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(updateRfp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
         }
-        return ResponseEntity.ok(saved);
     }
 
     @GetMapping("/{rfpId}")

@@ -9,6 +9,8 @@ import java.time.Instant;
 @Table(name = "rfps")
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Rfp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
