@@ -1,4 +1,4 @@
-package com.eventhub.auth.util;
+package com.eventhub.auth.filter;
 
 import com.eventhub.auth.dto.CustomUserDetails;
 import io.jsonwebtoken.Claims;

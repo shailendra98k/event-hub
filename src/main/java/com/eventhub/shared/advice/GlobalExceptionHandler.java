@@ -1,4 +1,4 @@
-package com.eventhub.shared.dto;
+package com.eventhub.shared.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
