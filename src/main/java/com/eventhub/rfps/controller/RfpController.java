@@ -30,21 +30,21 @@ public class RfpController {
         }
     }
 
-    @PutMapping("/{rfpId}")
-    public ResponseEntity<?> updateRfp(@PathVariable Long rfpId, @RequestBody RfpRequest request) {
-        try {
-            Rfp updateRfp = rfpService.updateRfp(rfpId, request);
-            if (updateRfp == null) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(updateRfp);
-        } catch (ChangeSetPersister.NotFoundException e) {
-            return ResponseEntity.status(404).body(new ErrorDetails(404, "Not Found"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
-        }
-    }
+//    @PutMapping("/{rfpId}")
+//    public ResponseEntity<?> updateRfp(@PathVariable Long rfpId, @RequestBody RfpRequest request) {
+//        try {
+//            Rfp updateRfp = rfpService.updateRfp(rfpId, request);
+//            if (updateRfp == null) {
+//                return ResponseEntity.notFound().build();
+//            }
+//            return ResponseEntity.ok(updateRfp);
+//        } catch (ChangeSetPersister.NotFoundException e) {
+//            return ResponseEntity.status(404).body(new ErrorDetails(404, "Not Found"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
+//        }
+//    }
 
     @GetMapping("/{rfpId}")
     public ResponseEntity<?> getRfpById(@PathVariable Long rfpId) {

@@ -1,5 +1,7 @@
 package com.eventhub.rfps.entity;
 
+import com.eventhub.auth.entity.User;
+import com.eventhub.venueDiscovery.entity.Venue;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,11 +18,13 @@ public class Rfp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long venueId;
+    @OneToOne
+    @JoinColumn(name = "venue_id", referencedColumnName = "id", nullable = false)
+    private Venue venue;
 
-    @Column(nullable = false)
-    private Long buyerUserId;
+    @OneToOne
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id", nullable = false)
+    private User buyer;
 
     @Column(nullable = false)
     private Instant eventDate;

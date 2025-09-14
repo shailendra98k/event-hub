@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RfpRepository extends JpaRepository<Rfp, Long> {
-    List<Rfp> findByVenueId(Long venueId);
-    List<Rfp> findByBuyerUserId(Long buyerUserId);
-    Page<Rfp> findByBuyerUserId(Long buyerUserId, Pageable pageable);
+    Page<Rfp> findByBuyerId(Long buyerId, Pageable pageable);
     Page<Rfp> findByVenueIdIn(List<Long> venueIds, Pageable pageable);
     // Add more query methods as needed
 }

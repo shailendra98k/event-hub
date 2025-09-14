@@ -2,6 +2,8 @@ package com.eventhub.rfps.service;
 
 import com.eventhub.auth.dto.CustomUserDetails;
 import com.eventhub.auth.entity.Role;
+import com.eventhub.auth.entity.User;
+import com.eventhub.auth.repository.UserRepository;
 import com.eventhub.rfps.dto.RfpRequest;
 import com.eventhub.rfps.entity.RFP_STATUS;
 import com.eventhub.rfps.entity.Rfp;
@@ -30,17 +32,22 @@ public class RfpService {
     @Autowired
     private VenueRepository venueRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public Rfp createRfp(RfpRequest request) throws AuthenticationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Long userId = userDetails.getUserId();
+            Venue venue = venueRepository.findById(request.getVenueId()).orElseThrow(() -> new IllegalArgumentException("Venue not found"));
+            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
             Rfp rfp = Rfp.builder()
-                    .venueId(request.getVenueId())
+                    .venue(venue)
                     .eventDate(request.getEventDate())
                     .headcount(request.getHeadcount())
                     .budgetMin(request.getBudgetMin())
                     .budgetMax(request.getBudgetMax())
-                    .buyerUserId(userId)
+                    .buyer(user)
                     .notes(request.getNotes())
                     .status(RFP_STATUS.SUBMITTED.name())
                     .createdAt(Instant.now())
@@ -54,34 +61,6 @@ public class RfpService {
 
     }
 
-    public Rfp updateRfp(Long rfpId, RfpRequest request) throws AuthenticationException, ChangeSetPersister.NotFoundException {
-        Optional<Rfp> optionalRfp = rfpRepository.findById(rfpId);
-        if (optionalRfp.isEmpty()) {
-            throw new ChangeSetPersister.NotFoundException();
-        }
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
-            Long userId = userDetails.getUserId();
-            Rfp rfp = optionalRfp.get();
-            Rfp updateRfRfp = Rfp.builder()
-                    .id(rfp.getId())
-                    .venueId(request.getVenueId())
-                    .buyerUserId(rfp.getBuyerUserId())
-                    .eventDate(request.getEventDate())
-                    .headcount(request.getHeadcount())
-                    .budgetMin(request.getBudgetMin())
-                    .budgetMax(request.getBudgetMax())
-                    .notes(request.getNotes())
-                    .buyerUserId(userId)
-                    .status(rfp.getStatus())
-                    .createdAt(rfp.getCreatedAt())
-                    .updatedAt(Instant.now())
-                    .build();
-            return rfpRepository.save(updateRfRfp);
-        } else {
-            throw new AuthenticationException("User not authenticated");
-        }
-    }
 
     public Optional<Rfp> getRfpById(Long rfpId) throws ChangeSetPersister.NotFoundException {
 
@@ -94,7 +73,7 @@ public class RfpService {
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Long userId = userDetails.getUserId();
             Rfp rfp = optionalRfp.get();
-            if (!rfp.getBuyerUserId().equals(userId)) {
+            if (!rfp.getBuyer().getId().equals(userId)) {
                 return Optional.empty();
             }
         } else {
@@ -114,7 +93,7 @@ public class RfpService {
                 List<Long> venueIds = venues.stream().map(Venue::getId).toList();
                 return rfpRepository.findByVenueIdIn(venueIds, pageable);
             }
-            return rfpRepository.findByBuyerUserId(userId, pageable);
+            return rfpRepository.findByBuyerId(userId, pageable);
         } else {
             throw new AuthenticationException("User not authenticated");
         }
