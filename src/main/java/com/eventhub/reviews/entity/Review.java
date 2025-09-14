@@ -27,6 +27,9 @@ public class Review {
     @Column(nullable = false)
     private Instant createdAt;
 
+    @Column
+    private String idempotencyKey;
+
     // Getters and setters
 }
 
