@@ -1,10 +1,13 @@
 package com.eventhub.rfps.service;
 
 import com.eventhub.auth.dto.CustomUserDetails;
+import com.eventhub.auth.entity.Role;
 import com.eventhub.rfps.dto.RfpRequest;
 import com.eventhub.rfps.entity.RFP_STATUS;
 import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.repository.RfpRepository;
+import com.eventhub.venueDiscovery.entity.Venue;
+import com.eventhub.venueDiscovery.repository.VenueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
@@ -12,15 +15,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.naming.AuthenticationException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class RfpService {
     @Autowired
     private RfpRepository rfpRepository;
+
+    @Autowired
+    private VenueRepository venueRepository;
 
     public Rfp createRfp(RfpRequest request) throws AuthenticationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -101,6 +109,11 @@ public class RfpService {
         if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
             Long userId = userDetails.getUserId();
             PageRequest pageable = PageRequest.of(page, size);
+            if(userDetails.getRole().equals(Role.VENUE_OWNER.name())) {
+                List<Venue> venues = venueRepository.findByUserId(userId);
+                List<Long> venueIds = venues.stream().map(Venue::getId).toList();
+                return rfpRepository.findByVenueIdIn(venueIds, pageable);
+            }
             return rfpRepository.findByBuyerUserId(userId, pageable);
         } else {
             throw new AuthenticationException("User not authenticated");
