@@ -18,11 +18,11 @@ public class Rfp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "venue_id", referencedColumnName = "id", nullable = false)
     private Venue venue;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "buyer_id", referencedColumnName = "id", nullable = false)
     private User buyer;
 
