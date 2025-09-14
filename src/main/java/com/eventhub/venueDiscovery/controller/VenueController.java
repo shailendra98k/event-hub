@@ -17,7 +17,7 @@ public class VenueController {
     @Autowired
     private VenueService venueService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createVenue(@RequestBody VenueRequest request) {
 
