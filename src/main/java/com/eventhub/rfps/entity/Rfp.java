@@ -41,6 +41,7 @@ public class Rfp {
     @Column(length = 1000)
     private String notes;
 
+    @Setter
     @Column(nullable = false)
     private String status; // e.g., submitted, accepted, countered, declined
 

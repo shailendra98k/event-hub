@@ -1,6 +1,7 @@
 package com.eventhub.rfps.controller;
 
 import com.eventhub.rfps.dto.RfpRequest;
+import com.eventhub.rfps.entity.RFP_STATUS;
 import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.service.RfpService;
 import com.eventhub.shared.dto.ErrorDetails;
@@ -60,11 +61,29 @@ public class RfpController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getRfpsByBuyer(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> getRfps(@RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "10") int size) {
         try {
             Page<Rfp> rfps = rfpService.getRfps(page, size);
             return ResponseEntity.ok(rfps);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));
+        }
+    }
+
+    @PatchMapping("/{rfpId}/{status}")
+    public ResponseEntity<?> updateRfpStatus(@PathVariable Long rfpId, @PathVariable RFP_STATUS status) {
+        try {
+            Rfp updatedRfp = rfpService.updateRfpStatus(rfpId, status);
+            if (updatedRfp == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(updatedRfp);
+        } catch (ChangeSetPersister.NotFoundException e) {
+            return ResponseEntity.status(404).body(new ErrorDetails(404, "Not Found"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorDetails(400, e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(new ErrorDetails(500, e.getLocalizedMessage()));

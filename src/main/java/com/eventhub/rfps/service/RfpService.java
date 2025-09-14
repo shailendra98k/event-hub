@@ -22,6 +22,7 @@ import org.w3c.dom.stylesheets.LinkStyle;
 import javax.naming.AuthenticationException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -97,5 +98,20 @@ public class RfpService {
         } else {
             throw new AuthenticationException("User not authenticated");
         }
+    }
+
+    public Rfp updateRfpStatus(Long rfpId, RFP_STATUS status) throws ChangeSetPersister.NotFoundException {
+        Optional<Rfp> optionalRfp = rfpRepository.findById(rfpId);
+        if (optionalRfp.isEmpty()) {
+            throw new ChangeSetPersister.NotFoundException();
+        }
+        Rfp rfp = optionalRfp.get();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if(!Objects.equals(rfp.getVenue().getOwner().getId(), ((CustomUserDetails) auth.getPrincipal()).getUserId())) {
+            throw new IllegalArgumentException("Only the venue owner can update the RFP status");
+        }
+        rfp.setStatus(status.name());
+        return rfpRepository.save(rfp);
     }
 }
