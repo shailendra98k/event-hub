@@ -3,37 +3,42 @@
 ## Overview
 EventHub is a Spring Boot application for venue discovery, reviews & ratings, user management, and RFP (Request for Proposal) workflows. It supports multiple user roles (BUYER, VENUE_OWNER, ADMIN) and provides secure authentication with JWT. Redis caching is used for performance optimization on venue search endpoints. The application uses a PostgreSQL database for persistent storage. This service powers the [`event-hub-ui`](https://github.com/shailendra98k/event-hub-ui) frontend project.
 
+## Architecture & Flow Diagram
+
+![EventHub Flow Diagram](flow%20diagram.png)
+
 ## Main Features
-- **User Authentication & Authorization**: Signup, login, JWT-based authentication, role-based access control.
-- **Venue Discovery**: Create, update, search, and filter venues by city, tags, and capacity. Venue owners can manage their venues.
-- **Reviews & Ratings**: Buyers can submit reviews and ratings for venues. Server validates review eligibility.
-- **RFP Management**: Buyers can submit RFPs to venues. Venue owners can view all RFPs submitted to their venues. RFP creation is idempotent (duplicate requests are prevented using Redis caching).
-- **Redis Caching**: Venue search results are cached for faster response times.
-- **Spring Security**: All endpoints are secured; role-based access is enforced.
-- **CI/CD with GitHub Actions**: Automated build, test, and deployment pipeline using GitHub Actions.
-- **Docker Support**: The application can be containerized and run using Docker for easy deployment.
+- **User Authentication & Authorization**: Signup, login, JWT-based authentication, role-based access control
+- **Venue Discovery**: Create, update, search, and filter venues by city, tags, and capacity. Venue owners can manage their venues
+- **Reviews & Ratings**: Buyers can submit reviews and ratings for venues. Server validates review eligibility. Review creation is idempotent
+- **RFP Management**: Buyers can submit RFPs to venues. Venue owners can view all RFPs submitted to their venues. RFP creation and status update are idempotent
+- **Redis Caching**: Venue search results are cached for faster response times
+- **Spring Security**: All endpoints are secured; role-based access is enforced
+- **Validation & Error Handling**: Request bodies are validated before controller logic. Custom error responses for 400, 401, 403, and 500
+- **CI/CD with GitHub Actions**: Automated build, test, and deployment pipeline using GitHub Actions
+- **Docker Support**: The application can be containerized and run using Docker for easy deployment
 
 ## API Endpoints
 ### Auth
-- `POST /auth/signup` - Register a new user (default role: BUYER)
-- `POST /auth/login` - Login and receive JWT token
+- `POST /api/auth/signup` - Register a new user (default role: BUYER)
+- `POST /api/auth/login` - Login and receive JWT token
+- `GET /api/auth/info` - Fetch user info (validates JWT)
+- `PATCH /api/auth/users/{userId}/role/{role}` - Update user role (ADMIN only)
 
 ### Venues
-- `POST /venues` - Create a new venue (VENUE_OWNER only)
-- `GET /venues` - Search venues (filter by cities, tags, min/max capacity; all query params optional; **this endpoint is Redis cached for fast response**)
-- `GET /venues/{id}` - Get venue details by ID
+- `POST /api/v1/venues` - Create a new venue (ADMIN only)
+- `GET /api/v1/venues` - Search venues (filter by city, tags, min/max capacity; all query params optional; **this endpoint is Redis cached for fast response**)
+- `GET /api/v1/venues/{id}` - Get venue details by ID
 
-### Reviews (Under Development)
-- `POST /venues/{id}/reviews` - Submit a review for a venue (BUYER only)
-- `GET /venues/{id}/reviews` - Get paginated reviews for a venue
+### Reviews
+- `POST /api/v1/reviews` - Submit a review for a venue (authenticated users; idempotent)
+- `GET /api/v1/reviews` - Get reviews for a venue (paginated, planned)
 
 ### RFPs
-- `POST /rfps` - Create RFP (idempotent, BUYER only)
-- `GET /api/v1/rfps` - Get paginated RFPs created by the current buyer
-- `GET /api/v1/rfps` - Get all RFPs submitted to venues owned by the current VENUE_OWNER
-
-### User Info
-- `GET /user/info` - Fetch user info (validates JWT)
+- `POST /api/v1/rfps` - Create RFP (idempotent, BUYER only)
+- `GET /api/v1/rfps/{rfpId}` - Get RFP by ID
+- `PATCH /api/v1/rfps/{rfpId}/{status}` - Update RFP status (VENUE_OWNER only)
+- `GET /api/v1/rfps` - Get paginated RFPs created by the current buyer or submitted to venues owned by the current VENUE_OWNER
 
 ## Postman Collection
 You can find the Postman collection for EventHub APIs here:
