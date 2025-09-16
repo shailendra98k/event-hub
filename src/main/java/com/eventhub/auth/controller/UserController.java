@@ -4,6 +4,7 @@ import com.eventhub.auth.dto.LoginResponse;
 import com.eventhub.auth.dto.SignupRequest;
 import com.eventhub.auth.dto.LoginRequest;
 import com.eventhub.auth.dto.UserInfo;
+import com.eventhub.auth.entity.Role;
 import com.eventhub.auth.entity.User;
 import com.eventhub.auth.service.UserService;
 import com.eventhub.shared.dto.ErrorDetails;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,5 +69,15 @@ public class UserController {
             return ResponseEntity.status(404).body(new ErrorDetails(404, "User not found"));
         }
         return ResponseEntity.ok(userOpt);
+    }
+
+    @PatchMapping("/{userId}/role/{role}")
+    public ResponseEntity<?> updateUserRole(@PathVariable Long userId, @PathVariable Role role) {
+        try {
+            User updatedUser = userService.updateUserRole(userId, role);
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(new ErrorDetails(400, e.getMessage()));
+        }
     }
 }

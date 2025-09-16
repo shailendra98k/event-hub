@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/index.html").permitAll()
                 .requestMatchers(HttpMethod.GET).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/venues").hasRole(Role.ADMIN.name()) // Only ADMIN can create venues
+                .requestMatchers(HttpMethod.PATCH, "/api/auth/*/role/*").hasRole(Role.ADMIN.name()) // Only ADMIN can change role of a user
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/rfps/*/*").hasRole(Role.VENUE_OWNER.name())
                 .anyRequest().authenticated()
                 .and()

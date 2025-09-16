@@ -37,7 +37,7 @@ public class UserService {
         User user = new User();
         user.setEmail(request.email);
         user.setHashedPassword(passwordEncoder.encode(request.password));
-        user.setRole(Optional.ofNullable(request.role).orElse(Role.BUYER));
+        user.setRole(Role.BUYER);
         user.setCreatedAt(Instant.now());
         return userRepository.save(user);
     }
@@ -76,5 +76,15 @@ public class UserService {
             }
         }
         return null;
+    }
+
+    public User updateUserRole(Long userId, Role role) throws BadRequestException {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new BadRequestException("User not found");
+        }
+        User user = userOpt.get();
+        user.setRole(role);
+        return userRepository.save(user);
     }
 }
