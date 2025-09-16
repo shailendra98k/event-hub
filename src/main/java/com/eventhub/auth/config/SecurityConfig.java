@@ -51,7 +51,7 @@ public class SecurityConfig {
     public AuthenticationEntryPoint customAuthenticationEntryPoint() {
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNAUTHORIZED.value(), "Authentication is required to access this resource.");
+            ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNAUTHORIZED.value(), "No token provided or token is invalid.");
             new ObjectMapper().writeValue(response.getOutputStream(), errorDetails);
         };
     }
@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/index.html").permitAll()
                 .requestMatchers(HttpMethod.GET).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/venues").hasRole(Role.ADMIN.name()) // Only ADMIN can create venues
+                .requestMatchers(HttpMethod.POST, "/api/v1/reviews").authenticated()// Authenticated users can post reviews
                 .requestMatchers(HttpMethod.PATCH, "/api/auth/*/role/*").hasRole(Role.ADMIN.name()) // Only ADMIN can change role of a user
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/rfps/*/*").hasRole(Role.VENUE_OWNER.name())
                 .anyRequest().authenticated()

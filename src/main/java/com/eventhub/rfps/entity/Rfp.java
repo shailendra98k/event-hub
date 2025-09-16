@@ -50,5 +50,8 @@ public class Rfp {
 
     @Column(nullable = false)
     private Instant updatedAt;
+
+    @Column
+    private String idempotencyKey;
 }
 
