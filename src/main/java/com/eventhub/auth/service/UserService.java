@@ -8,6 +8,7 @@ import com.eventhub.auth.dto.SignupRequest;
 import com.eventhub.auth.dto.LoginRequest;
 import com.eventhub.auth.util.JwtUtil;
 import com.eventhub.auth.dto.LoginResponse;
+import com.eventhub.shared.service.EmailService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,9 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    @Autowired
+    private EmailService emailService;
+
     public User signup(SignupRequest request) throws BadRequestException {
         if (userRepository.findByEmail(request.email).isPresent()) {
             throw new BadRequestException("Email already in use");
@@ -39,7 +43,18 @@ public class UserService {
         user.setHashedPassword(passwordEncoder.encode(request.password));
         user.setRole(Role.BUYER);
         user.setCreatedAt(Instant.now());
-        return userRepository.save(user);
+        user.setFirstName(request.firstName);
+        user.setLastName(request.lastName);
+
+        User savedUser = userRepository.save(user);
+        // Send welcome email
+        try{
+            emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFirstName() != null ? savedUser.getFirstName() : savedUser.getEmail());
+        } catch (Exception e){
+            System.out.println("Failed to send welcome email to " + savedUser.getEmail());
+            e.printStackTrace();
+        }
+        return savedUser;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -52,7 +67,14 @@ public class UserService {
         if (!passwordEncoder.matches(request.password, user.getHashedPassword())) {
             return null;
         }
-        return LoginResponse.builder()
+        // Send sign-in notification email
+        try {
+            emailService.sendSignInNotification(user.getEmail(), user.getFirstName() != null ? user.getFirstName() : user.getEmail());
+        } catch (Exception e){
+            System.out.println("Failed to send sign-in notification email to " + user.getEmail());
+            e.printStackTrace();
+        }
+         return LoginResponse.builder()
                 .token(jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name()))
                 .firstName(user.getFirstName())
                 .role(user.getRole())
