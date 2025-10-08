@@ -1,4 +1,4 @@
-package com.eventhub.shared.service;
+package com.eventhub.shared.producer;
 
 import com.eventhub.shared.dto.EmailMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

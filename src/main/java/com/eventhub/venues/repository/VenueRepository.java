@@ -1,6 +1,6 @@
-package com.eventhub.venueDiscovery.repository;
+package com.eventhub.venues.repository;
 
-import com.eventhub.venueDiscovery.entity.Venue;
+import com.eventhub.venues.entity.Venue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

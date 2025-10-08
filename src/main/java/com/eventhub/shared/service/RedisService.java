@@ -1,6 +1,6 @@
-package com.eventhub.venueDiscovery.service;
+package com.eventhub.shared.service;
 
-import com.eventhub.venueDiscovery.dto.VenueInfo;
+import com.eventhub.venues.dto.VenueInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

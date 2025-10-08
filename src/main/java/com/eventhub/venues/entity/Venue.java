@@ -1,4 +1,4 @@
-package com.eventhub.venueDiscovery.entity;
+package com.eventhub.venues.entity;
 
 import com.eventhub.auth.entity.User;
 import jakarta.persistence.*;

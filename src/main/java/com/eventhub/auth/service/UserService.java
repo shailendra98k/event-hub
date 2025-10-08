@@ -9,7 +9,7 @@ import com.eventhub.auth.dto.LoginRequest;
 import com.eventhub.auth.util.JwtUtil;
 import com.eventhub.auth.dto.LoginResponse;
 import com.eventhub.shared.dto.EmailMessage;
-import com.eventhub.shared.service.EmailProducer;
+import com.eventhub.shared.producer.EmailProducer;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

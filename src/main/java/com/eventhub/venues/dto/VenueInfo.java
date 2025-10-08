@@ -1,4 +1,4 @@
-package com.eventhub.venueDiscovery.dto;
+package com.eventhub.venues.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class VenueInfo implements Serializable {
     private Integer rate;
     private String address;
 
-    public static VenueInfo fromVenue(com.eventhub.venueDiscovery.entity.Venue venue) {
+    public static VenueInfo fromVenue(com.eventhub.venues.entity.Venue venue) {
         return new VenueInfo(
             venue.getId(),
             venue.getName(),

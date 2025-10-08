@@ -1,12 +1,11 @@
-package com.eventhub.venueDiscovery.controller;
+package com.eventhub.venues.controller;
 
-import com.eventhub.venueDiscovery.dto.VenueInfo;
-import com.eventhub.venueDiscovery.dto.VenueRequest;
-import com.eventhub.venueDiscovery.entity.Venue;
-import com.eventhub.venueDiscovery.service.VenueService;
+import com.eventhub.venues.dto.VenueInfo;
+import com.eventhub.venues.dto.VenueRequest;
+import com.eventhub.venues.entity.Venue;
+import com.eventhub.venues.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

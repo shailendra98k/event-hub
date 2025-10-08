@@ -1,11 +1,12 @@
-package com.eventhub.venueDiscovery.service;
+package com.eventhub.venues.service;
 
 import com.eventhub.auth.entity.User;
 import com.eventhub.auth.repository.UserRepository;
-import com.eventhub.venueDiscovery.dto.VenueInfo;
-import com.eventhub.venueDiscovery.dto.VenueRequest;
-import com.eventhub.venueDiscovery.entity.Venue;
-import com.eventhub.venueDiscovery.repository.VenueRepository;
+import com.eventhub.shared.service.RedisService;
+import com.eventhub.venues.dto.VenueInfo;
+import com.eventhub.venues.dto.VenueRequest;
+import com.eventhub.venues.entity.Venue;
+import com.eventhub.venues.repository.VenueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

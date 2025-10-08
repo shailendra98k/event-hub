@@ -8,8 +8,8 @@ import com.eventhub.rfps.dto.RfpRequest;
 import com.eventhub.rfps.entity.RFP_STATUS;
 import com.eventhub.rfps.entity.Rfp;
 import com.eventhub.rfps.repository.RfpRepository;
-import com.eventhub.venueDiscovery.entity.Venue;
-import com.eventhub.venueDiscovery.repository.VenueRepository;
+import com.eventhub.venues.entity.Venue;
+import com.eventhub.venues.repository.VenueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.naming.AuthenticationException;
 import java.time.Instant;

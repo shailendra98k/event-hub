@@ -1,4 +1,4 @@
-package com.eventhub.venueDiscovery.dto;
+package com.eventhub.venues.dto;
 
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 package com.eventhub.reviews.entity;
 
 import com.eventhub.auth.entity.User;
-import com.eventhub.venueDiscovery.entity.Venue;
+import com.eventhub.venues.entity.Venue;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
