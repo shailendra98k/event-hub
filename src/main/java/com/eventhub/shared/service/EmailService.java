@@ -10,19 +10,11 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendWelcomeEmail(String to, String name) {
+    public void sendEmail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Welcome to EventHub!");
-        message.setText("Hello " + name + ",\n\nWelcome to EventHub! We're glad to have you on board.");
-        mailSender.send(message);
-    }
-
-    public void sendSignInNotification(String to, String name) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Sign-In Notification");
-        message.setText("Hello " + name + ",\n\nYour account was just signed in. If this wasn't you, please contact support.");
+        message.setSubject(subject);
+        message.setText(body);
         mailSender.send(message);
     }
 }

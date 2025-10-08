@@ -8,7 +8,8 @@ import com.eventhub.auth.dto.SignupRequest;
 import com.eventhub.auth.dto.LoginRequest;
 import com.eventhub.auth.util.JwtUtil;
 import com.eventhub.auth.dto.LoginResponse;
-import com.eventhub.shared.service.EmailService;
+import com.eventhub.shared.dto.EmailMessage;
+import com.eventhub.shared.service.EmailProducer;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -32,7 +33,7 @@ public class UserService {
     }
 
     @Autowired
-    private EmailService emailService;
+    private EmailProducer emailProducer;
 
     public User signup(SignupRequest request) throws BadRequestException {
         if (userRepository.findByEmail(request.email).isPresent()) {
@@ -47,13 +48,14 @@ public class UserService {
         user.setLastName(request.lastName);
 
         User savedUser = userRepository.save(user);
-        // Send welcome email
-        try{
-            emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFirstName() != null ? savedUser.getFirstName() : savedUser.getEmail());
-        } catch (Exception e){
-            System.out.println("Failed to send welcome email to " + savedUser.getEmail());
-            e.printStackTrace();
-        }
+        // Send welcome email via RabbitMQ
+        String name = savedUser.getFirstName() != null ? savedUser.getFirstName() : savedUser.getEmail();
+        EmailMessage welcomeMsg = new EmailMessage(
+            savedUser.getEmail(),
+            "Welcome to EventHub!",
+            "Hello " + name + ",\n\nWelcome to EventHub! We're glad to have you on board."
+        );
+        emailProducer.sendEmail(welcomeMsg);
         return savedUser;
     }
 
@@ -67,14 +69,15 @@ public class UserService {
         if (!passwordEncoder.matches(request.password, user.getHashedPassword())) {
             return null;
         }
-        // Send sign-in notification email
-        try {
-            emailService.sendSignInNotification(user.getEmail(), user.getFirstName() != null ? user.getFirstName() : user.getEmail());
-        } catch (Exception e){
-            System.out.println("Failed to send sign-in notification email to " + user.getEmail());
-            e.printStackTrace();
-        }
-         return LoginResponse.builder()
+        // Send sign-in notification email via RabbitMQ
+        String name = user.getFirstName() != null ? user.getFirstName() : user.getEmail();
+        EmailMessage signInMsg = new EmailMessage(
+            user.getEmail(),
+            "Sign-In Notification",
+            "Hello " + name + ",\n\nYour account was just signed in. If this wasn't you, please contact support."
+        );
+        emailProducer.sendEmail(signInMsg);
+        return LoginResponse.builder()
                 .token(jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name()))
                 .firstName(user.getFirstName())
                 .role(user.getRole())
