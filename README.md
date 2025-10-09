@@ -9,6 +9,7 @@ EventHub is a Spring Boot application for venue discovery, reviews & ratings, us
 
 ## Main Features
 - **User Authentication & Authorization**: Signup, login, JWT-based authentication, role-based access control
+- **Email Notifications**: Welcome email is sent on signup and sign-in notification email is sent on login. Email sending is handled asynchronously via RabbitMQ for high throughput and reliability
 - **Venue Discovery**: Create, update, search, and filter venues by city, tags, and capacity. Venue owners can manage their venues
 - **Reviews & Ratings**: Buyers can submit reviews and ratings for venues. Server validates review eligibility. Review creation is idempotent
 - **RFP Management**: Buyers can submit RFPs to venues. Venue owners can view all RFPs submitted to their venues. RFP creation and status update are idempotent
@@ -20,8 +21,8 @@ EventHub is a Spring Boot application for venue discovery, reviews & ratings, us
 
 ## API Endpoints
 ### Auth
-- `POST /api/auth/signup` - Register a new user (default role: BUYER)
-- `POST /api/auth/login` - Login and receive JWT token
+- `POST /api/auth/signup` - Register a new user (default role: BUYER, triggers welcome email)
+- `POST /api/auth/login` - Login and receive JWT token (triggers sign-in notification email)
 - `GET /api/auth/info` - Fetch user info (validates JWT)
 - `PATCH /api/auth/users/{userId}/role/{role}` - Update user role (ADMIN only)
 
@@ -51,13 +52,14 @@ You can find the Postman collection for EventHub APIs here:
 - **Spring Security**
 - **JWT**
 - **Redis**
+- **RabbitMQ**
 - **PostgreSQL**
 - **Lombok**
 - **Maven**
 
 ## How to Run
 1. Install Java 17+ and Maven 3.8+
-2. Configure Redis (update `application.properties` with correct host, port, username, password)
+2. Configure Redis and RabbitMQ (update `application.properties` with correct host, port, username, password)
 3. Build: `mvn clean install`
 4. Run: `mvn spring-boot:run`
 
@@ -90,9 +92,11 @@ docker run -p 8080:8080 shailendra98k/eventhub:master
 - All entity field names must match JPA queries (e.g., `ownerUserId` in `Venue`).
 - Validation errors return detailed messages in API responses.
 - Role-based access is enforced using `@PreAuthorize` annotations.
+- Email notifications are triggered asynchronously via RabbitMQ for signup and login events.
 
 ## Troubleshooting
 - **Redis Connection Refused**: Check Redis server status and credentials in `application.properties`.
+- **RabbitMQ Connection Issues**: Check RabbitMQ server status and credentials in `application.properties`.
 - **JPA Query Errors**: Ensure entity field names match query attributes.
 - **Validation Errors**: API returns detailed validation messages for request body issues.
 
@@ -101,6 +105,7 @@ docker run -p 8080:8080 shailendra98k/eventhub:master
 - [Spring Data JPA](https://docs.spring.io/spring-boot/3.5.5/reference/data/sql.html#data.sql.jpa-and-spring-data)
 - [Spring Security](https://docs.spring.io/spring-boot/3.5.5/reference/web/spring-security.html)
 - [Spring Data Redis](https://docs.spring.io/spring-data/redis/docs/current/reference/html/)
+- [Spring AMQP (RabbitMQ)](https://docs.spring.io/spring-amqp/docs/current/reference/html/)
 
 ## Project Structure
 - `auth/` - Authentication, user management
