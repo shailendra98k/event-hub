@@ -11,14 +11,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Create .env file
+      - name: Overwrite Application property file
         run: |
-          touch .env
-          echo DB_USER_PASSWORD='${{secrets.DB_USER_PASSWORD}}' >> .env
-          echo REDIS_PASSWORD='${{secrets.REDIS_PASSWORD}}' >> .env
-          echo JWT_SECRET='${{secrets.JWT_SECRET}}' >> .env
-          echo EMAIL_APP_PASSWORD='${{secrets.EMAIL_APP_PASSWORD}}' >> .env
-          echo RABBITMQ_CONN_URL='${{secrets.RABBITMQ_CONN_URL}}' >> .env
+          cd src/main/resources
+          echo spring.datasource.password=${DB_USER_PASSWORD} >> application.properties
+          echo spring.redis.password = ${REDIS_PASSWORD} >> application.properties
+          echo spring.mail.password=${EMAIL_APP_PASSWORD} >> application.properties
+          echo spring.rabbitmq.addresses= ${RABBITMQ_CONN_URL} >> application.properties
+          echo jwt.secret= ${JWT_SECRET} >> application.properties
 
       - name: Build Docker Image
         run: |
