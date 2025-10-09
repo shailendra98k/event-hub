@@ -11,21 +11,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Overwrite Application property file
+      - name: Create .env file
         run: |
-          cd src/main/resources
-          echo server.port=8080 >> application.properties
-          echo spring.datasource.url=jdbc:postgresql://ap-south-1.f913d638-feb6-495d-9fc8-b7ba98f76aec.aws.yugabyte.cloud:5433/postgres >> application.properties
-          echo spring.datasource.username=admin >> application.properties
-          echo spring.datasource.password=GQ6o6aeHZiwbHOmedrV55ksuYUpMeh >> application.properties
-          echo spring.datasource.driver-class-name=org.postgresql.Driver >> application.properties
-          echo spring.jpa.hibernate.ddl-auto=update >> application.properties
-          echo spring.redis.host=redis-16119.c305.ap-south-1-1.ec2.redns.redis-cloud.com >> application.properties
-          echo spring.redis.port=16119 >> application.properties
-          echo spring.redis.password=OqlZw2EjqmIQVmuqXKoTKbGwW4SgiuOr >> application.properties
-          
-          echo jwt.secret=MySuperSecretKeyForJWTGeneration1234567890 >> application.properties
-          echo jwt.expiration=15 >> application.properties
+          touch .env
+          echo DB_USER_PASSWORD='${{secrets.DB_USER_PASSWORD}}' >> .env
+          echo REDIS_PASSWORD='${{secrets.REDIS_PASSWORD}}' >> .env
+          echo JWT_SECRET='${{secrets.JWT_SECRET}}' >> .env
+          echo EMAIL_APP_PASSWORD='${{secrets.EMAIL_APP_PASSWORD}}' >> .env
+          echo RABBITMQ_CONN_URL='${{secrets.RABBITMQ_CONN_URL}}' >> .env
 
       - name: Build Docker Image
         run: |
