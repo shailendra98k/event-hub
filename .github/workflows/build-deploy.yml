@@ -14,6 +14,25 @@ jobs:
       - name: Overwrite Application property file
         run: |
           cd src/main/resources
+          echo "# THIS FILE IS AUTO GENERATED, DO NOT MODIFY" > application.properties
+          echo spring.application.name=eventHub  >> application.properties
+          echo jwt.expiration=15  >> application.properties
+          echo server.port=8080 >> application.properties
+          echo spring.redis.port=15495  >> application.properties
+          echo spring.redis.host=redis-15495.c17.us-east-1-4.ec2.redns.redis-cloud.com  >> application.properties
+          echo spring.jpa.hibernate.ddl-auto=update  >> application.properties
+          echo spring.datasource.driver-class-name=org.postgresql.Driver  >> application.properties
+          echo spring.datasource.username=admin  >> application.properties
+          echo spring.datasource.url=jdbc:postgresql://ap-south-1.f913d638-feb6-495d-9fc8-b7ba98f76aec.aws.yugabyte.cloud:5433/postgres >> application.properties
+          echo spring.mail.host=smtp.gmail.com  >> application.properties
+          echo spring.mail.port=587  >> application.properties
+          echo spring.mail.username=shailendra98k@gmail.com  >> application.properties
+          echo spring.mail.properties.mail.smtp.auth=true  >> application.properties  
+          echo spring.mail.properties.mail.smtp.starttls.enable=true  >> application.properties
+          echo rabbitmq.exchange=amq.direct  >> application.properties
+          echo rabbitmq.email.queue=emailQueue  >> application.properties
+          echo rabbitmq.email.routingKey=email  >> application.properties
+#         secrets
           echo "spring.datasource.password= ${{ secrets.DB_USER_PASSWORD }}"  >> application.properties
           echo "spring.redis.password = ${{ secrets.DB_USER_PASSWORD }}" >> application.properties
           echo "spring.mail.password=${{ secrets.DB_USER_PASSWORD }}" >> application.properties
