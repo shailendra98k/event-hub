@@ -15,10 +15,10 @@ jobs:
         run: |
           cd src/main/resources
           echo "spring.datasource.password= ${{ secrets.DB_USER_PASSWORD }}"  >> application.properties
-          echo "spring.redis.password = ${{ secrets.REDIS_PASSWORD }}" >> application.properties
-          echo "spring.mail.password=${{ secrets.EMAIL_APP_PASSWORD }}" >> application.properties
-          echo "spring.rabbitmq.addresses= ${{ secrets.RABBITMQ_CONN_URL }}" >> application.properties
-          echo "jwt.secret= ${{ secrets.JWT_SECRET }}" >> application.properties
+          echo "spring.redis.password = ${{ secrets.DB_USER_PASSWORD }}" >> application.properties
+          echo "spring.mail.password=${{ secrets.DB_USER_PASSWORD }}" >> application.properties
+          echo "spring.rabbitmq.addresses= ${{ secrets.DB_USER_PASSWORD }}" >> application.properties
+          echo "jwt.secret= ${{ secrets.DB_USER_PASSWORD }}" >> application.properties
 
       - name: Build Docker Image
         run: |
